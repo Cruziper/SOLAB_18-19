@@ -55,7 +55,6 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "lib/list.h"
 #include "maze.h"
 #include "router.h"
@@ -89,7 +88,6 @@ static void displayUsage (const char* appName){
     printf("Usage: %s [options]\n", appName);
     puts("\nOptions:                            (defaults)\n");
     printf("    b <INT>    [b]end cost          (%i)\n", PARAM_DEFAULT_BENDCOST);
-    printf("    p          [p]rint routed maze  (false)\n");
     printf("    x <UINT>   [x] movement cost    (%i)\n", PARAM_DEFAULT_XCOST);
     printf("    y <UINT>   [y] movement cost    (%i)\n", PARAM_DEFAULT_YCOST);
     printf("    z <UINT>   [z] movement cost    (%i)\n", PARAM_DEFAULT_ZCOST);
@@ -146,16 +144,7 @@ static void parseArgs (long argc, char* const argv[]){
     if (opterr) {
         displayUsage(argv[0]);
     }
-}
-
-int searchInput(char** argv){
-  int i;
-  for(i=1; i<sizeof(argv); i++){
-    if(strcmp(argv[i], "inputs/")>0){
-      return i;
-    }
-  }
-  exit(1);
+    global_inputFile = agrv[optind];
 }
 
 
@@ -167,26 +156,31 @@ int main(int argc, char** argv){
     /*
      * Initialization
      */
-    int x = searchInput(argv);
     parseArgs(argc, (char** const)argv);
     maze_t* mazePtr = maze_alloc();
     assert(mazePtr);
 
-    FILE *inputFile;
-    inputFile = fopen(argv[x], "r");
-    if(inputFile == NULL) {
-      perror ("Erro a abrir o ficheiro");
-      exit(1);
+//INPUT FILE CREATE
+    FILE* inputFile;
+    inputFile = fopen(global_inputFile, "r");
+    if (inputFile == NULL)
+    {
+        perror ("Erro a abrir o ficheiro: %s", global_inputFile);
+        exit(1);
     }
 
-    FILE *outputFile;
-    outputFile = fopen(strcat(argv[x],".res"), "w");
-    if(outputFile == NULL) {
-      perror ("Erro a criar o ficheiro");
-      exit(1);
-    }
+//OUTPUT FILE CREATE / UPDATE / REMOVE
+    FILE* outputFile;
+    char* auxRES;
+    char* auxOLD;
+    strcpy(global_inputFile, auxRES);
+    strcat(auxRES, ".res");
+    strcpy(auxRES, auxOLD);
+    strcat(auxOLD, ".old");
+    printf(" %s %s\n", auxRES, auxOLD );
+    outputFile= fopen(global_inputFile, "w");
 
-    long numPathToRoute = maze_read(mazePtr, inputFile, outputFile);
+    long numPathToRoute = maze_read(mazePtr);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
@@ -223,9 +217,6 @@ int main(int argc, char** argv){
     assert(status == TRUE);
     fputs("Verification passed.", outputFile);
 
-    fflush(outputFile);
-    fclose(outputFile);
-
     maze_free(mazePtr);
     router_free(routerPtr);
 
@@ -240,6 +231,8 @@ int main(int argc, char** argv){
         vector_free(pathVectorPtr);
     }
     list_free(pathVectorListPtr);
+
+
     exit(0);
 }
 
