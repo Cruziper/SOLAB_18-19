@@ -54,6 +54,7 @@
 #include <assert.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "lib/list.h"
 #include "maze.h"
@@ -144,7 +145,7 @@ static void parseArgs (long argc, char* const argv[]){
     if (opterr) {
         displayUsage(argv[0]);
     }
-    global_inputFile = agrv[optind];
+    global_inputFile = argv[optind];
 }
 
 
@@ -165,7 +166,7 @@ int main(int argc, char** argv){
     inputFile = fopen(global_inputFile, "r");
     if (inputFile == NULL)
     {
-        perror ("Erro a abrir o ficheiro: %s", global_inputFile);
+        perror ("Erro a abrir o ficheiro: %s");
         exit(1);
     }
 
@@ -180,7 +181,7 @@ int main(int argc, char** argv){
     printf(" %s %s\n", auxRES, auxOLD );
     outputFile= fopen(global_inputFile, "w");
 
-    long numPathToRoute = maze_read(mazePtr);
+    long numPathToRoute = maze_read(mazePtr, outputFile);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
@@ -213,7 +214,7 @@ int main(int argc, char** argv){
      * Check solution and clean up
      */
     assert(numPathRouted <= numPathToRoute);
-    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint, inputFile, outputFile);
+    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint, outputFile);
     assert(status == TRUE);
     fputs("Verification passed.", outputFile);
 
