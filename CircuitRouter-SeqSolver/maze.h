@@ -54,7 +54,7 @@
 #ifndef MAZE_H
 #define MAZE_H 1
 
-
+#include <stdio.h>
 #include "coordinate.h"
 #include "grid.h"
 #include "lib/list.h"
