@@ -137,7 +137,7 @@ static void parseArgs (long argc, char* const argv[]){
         }
     }
 
-    for (i = optind; i < argc; i++) {
+    for (i = optind+1; i < argc; i++) {
         fprintf(stderr, "Non-option argument: %s\n", argv[i]);
         opterr++;
     }
