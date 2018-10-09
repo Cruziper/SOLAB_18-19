@@ -54,8 +54,8 @@
 #include <assert.h>
 #include <getopt.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "lib/list.h"
 #include "maze.h"
 #include "router.h"
@@ -145,7 +145,7 @@ static void parseArgs (long argc, char* const argv[]){
     if (opterr) {
         displayUsage(argv[0]);
     }
-    global_inputFile = argv[optind];
+	global_inputFile =argv[optind];
 }
 
 
@@ -160,28 +160,22 @@ int main(int argc, char** argv){
     parseArgs(argc, (char** const)argv);
     maze_t* mazePtr = maze_alloc();
     assert(mazePtr);
-
-//INPUT FILE CREATE
-    FILE* inputFile;
+//INPUT FILE
+    FILE *inputFile;
     inputFile = fopen(global_inputFile, "r");
-    if (inputFile == NULL)
-    {
-        perror ("Erro a abrir o ficheiro: %s");
-        exit(1);
+    if(inputFile == NULL) {
+      perror ("Erro a abrir o ficheiro");
+      exit(1);
+    }
+//OUTPUT FILES
+    FILE *outputFile;
+    outputFile = fopen(strcat(global_inputFile,".res"), "w");
+    if(outputFile == NULL) {
+      perror ("Erro a criar o ficheiro");
+      exit(1);
     }
 
-//OUTPUT FILE CREATE / UPDATE / REMOVE
-    FILE* outputFile;
-    char* auxRES;
-    char* auxOLD;
-    strcpy(global_inputFile, auxRES);
-    strcat(auxRES, ".res");
-    strcpy(auxRES, auxOLD);
-    strcat(auxOLD, ".old");
-    printf(" %s %s\n", auxRES, auxOLD );
-    outputFile= fopen(global_inputFile, "w");
-
-    long numPathToRoute = maze_read(mazePtr, outputFile);
+    long numPathToRoute = maze_read(mazePtr, inputFile, outputFile);
     router_t* routerPtr = router_alloc(global_params[PARAM_XCOST],
                                        global_params[PARAM_YCOST],
                                        global_params[PARAM_ZCOST],
@@ -214,10 +208,13 @@ int main(int argc, char** argv){
      * Check solution and clean up
      */
     assert(numPathRouted <= numPathToRoute);
-    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint, outputFile);
+    bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint, inputFile, outputFile);
     assert(status == TRUE);
-    fputs("Verification passed.", outputFile);
+    fputs("\nVerification passed.", outputFile);
+
+    fflush(outputFile);
     fclose(outputFile);
+
     maze_free(mazePtr);
     router_free(routerPtr);
 
@@ -232,8 +229,6 @@ int main(int argc, char** argv){
         vector_free(pathVectorPtr);
     }
     list_free(pathVectorListPtr);
-
-
     exit(0);
 }
 

@@ -220,7 +220,7 @@ void grid_addPath_Ptr (grid_t* gridPtr, vector_t* pointVectorPtr){
 
     for (i = 1; i < (n-1); i++) {
         long* gridPointPtr = (long*)vector_at(pointVectorPtr, i);
-        *gridPointPtr = GRID_POINT_FULL; 
+        *gridPointPtr = GRID_POINT_FULL;
     }
 }
 
@@ -234,7 +234,7 @@ void grid_print (grid_t* gridPtr, FILE *outputFile){
     long height = gridPtr->height;
     long depth  = gridPtr->depth;
     long z;
-
+//printf("something works\n");
     for (z = 0; z < depth; z++) {
         fprintf(outputFile, "[z = %li]\n", z);
         long x;
@@ -248,7 +248,6 @@ void grid_print (grid_t* gridPtr, FILE *outputFile){
         fputs("", outputFile);
     }
 }
-
 
 /* =============================================================================
  *
