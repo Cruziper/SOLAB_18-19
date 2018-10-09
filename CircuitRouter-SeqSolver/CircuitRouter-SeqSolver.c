@@ -172,14 +172,20 @@ int main(int argc, char** argv){
     FILE *outputFile;
     char* local_outputFile;
     local_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0) 
-    char* aux_outpuFile;
-    aux_outpuFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
+    char* aux_outputFile;
+    aux_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
     strcpy(local_outputFile, global_inputFile);
-    strcpy(aux_outpuFile, local_outputFile);
-    strcat(aux_outpuFile,".res");
-    if (access(aux_outpuFile, 0) == 0) { 
+    strcpy(aux_outputFile, local_outputFile);
+    strcat(aux_outputFile,".res");
+    if (access(aux_outputFile, 0) == 0) { 
         //file exists;
-        rename(aux_outpuFile, strcat(aux_outpuFile, ".old"));
+        printf("EXISTE\n");
+        char* aux2_outputFile;
+        aux2_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
+        strcpy(aux2_outputFile, aux_outputFile);
+        strcat(aux2_outputFile, ".old");
+        printf("%s\n", aux2_outputFile);
+        rename(aux_outputFile, aux2_outputFile);
         strcat(local_outputFile, ".res");
         outputFile = fopen(local_outputFile, "w");
         if(outputFile == NULL) {
@@ -189,6 +195,7 @@ int main(int argc, char** argv){
     } 
     else { 
         //file does not exist;
+        printf("NAO EXISTE\n");
         strcat(local_outputFile, ".res");
         outputFile = fopen(local_outputFile, "w");
         if(outputFile == NULL) {
@@ -237,7 +244,7 @@ int main(int argc, char** argv){
     fflush(outputFile);
     fclose(outputFile);
     free(local_outputFile);
-    free(aux_outpuFile);
+    free(aux_outputFile);
     maze_free(mazePtr);
     router_free(routerPtr);
 
