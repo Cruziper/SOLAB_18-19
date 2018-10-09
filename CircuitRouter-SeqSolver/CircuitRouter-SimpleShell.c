@@ -2,28 +2,33 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lib/comandlinereader.h"
+#include <sys/wait.h>
+#include "../lib/commandlinereader.h"
 
 
 int main(int argc, char** argv){
 
-  int pid, estado;
   int vectorSize = 10;
-  char **argVector[vectorSize];
+  char *argVector[vectorSize];
   int bufferSize = 150;
-  char *buffer[bufferSize];
+  char buffer[bufferSize];
 
-  int numArgs = readLineArguments(argVector, vectorSize, buffer, bufferSize);
+  while(1){
+    int numArgs = readLineArguments(argVector, vectorSize, buffer, bufferSize);
+    printf("%s\n", argVector[0]);
 
+    pid_t pid = fork();
 
-  pid = fork();
-
-  if(pid == 0){
-    printf("sou o Filho!\n");
-    exit(0);
-  }
-  else{
-    pid = wait(&estado);
+    if(pid<0){
+      perror("Erro ao criar a Fork()\n");
+      exit(-1);
+    }
+    if(pid == 0){
+      execv('./CircuitRouter-SeqSolver.c', argVector[1]);
+    }
+    else{
+      wait(NULL);
+    }
   }
 
 }
