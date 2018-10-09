@@ -234,7 +234,6 @@ void grid_print (grid_t* gridPtr, FILE *outputFile){
     long height = gridPtr->height;
     long depth  = gridPtr->depth;
     long z;
-//printf("something works\n");
     for (z = 0; z < depth; z++) {
         fprintf(outputFile, "[z = %li]\n", z);
         long x;

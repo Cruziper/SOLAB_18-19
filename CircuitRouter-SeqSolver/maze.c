@@ -360,7 +360,6 @@ bool_t maze_checkPaths (maze_t* mazePtr, list_t* pathVectorListPtr, bool_t doPri
     } /* iterate over pathVectorList */
 
     fputs("\nRouted Maze:", outputFile);
-            printf("something works\n");
     grid_print(testGridPtr, outputFile);
 
     grid_free(testGridPtr);

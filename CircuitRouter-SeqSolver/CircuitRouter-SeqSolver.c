@@ -54,6 +54,7 @@
 #include <assert.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include "lib/list.h"
@@ -169,10 +170,31 @@ int main(int argc, char** argv){
     }
 //OUTPUT FILES
     FILE *outputFile;
-    outputFile = fopen(strcat(global_inputFile,".res"), "w");
-    if(outputFile == NULL) {
-      perror ("Erro a criar o ficheiro");
-      exit(1);
+    char* local_outputFile;
+    local_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0) 
+    char* aux_outpuFile;
+    aux_outpuFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
+    strcpy(local_outputFile, global_inputFile);
+    strcpy(aux_outpuFile, local_outputFile);
+    strcat(aux_outpuFile,".res");
+    if (access(aux_outpuFile, 0) == 0) { 
+        //file exists;
+        rename(aux_outpuFile, strcat(aux_outpuFile, ".old"));
+        strcat(local_outputFile, ".res");
+        outputFile = fopen(local_outputFile, "w");
+        if(outputFile == NULL) {
+            perror ("Erro a criar o ficheiro");
+            exit(1);
+        }
+    } 
+    else { 
+        //file does not exist;
+        strcat(local_outputFile, ".res");
+        outputFile = fopen(local_outputFile, "w");
+        if(outputFile == NULL) {
+            perror ("Erro a criar o ficheiro");
+            exit(1);
+        }
     }
 
     long numPathToRoute = maze_read(mazePtr, inputFile, outputFile);
@@ -214,7 +236,8 @@ int main(int argc, char** argv){
 
     fflush(outputFile);
     fclose(outputFile);
-
+    free(local_outputFile);
+    free(aux_outpuFile);
     maze_free(mazePtr);
     router_free(routerPtr);
 
