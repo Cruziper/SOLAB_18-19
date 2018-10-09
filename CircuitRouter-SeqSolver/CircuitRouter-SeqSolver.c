@@ -217,7 +217,7 @@ int main(int argc, char** argv){
     bool_t status = maze_checkPaths(mazePtr, pathVectorListPtr, global_doPrint, outputFile);
     assert(status == TRUE);
     fputs("Verification passed.", outputFile);
-
+    fclose(outputFile);
     maze_free(mazePtr);
     router_free(routerPtr);
 
