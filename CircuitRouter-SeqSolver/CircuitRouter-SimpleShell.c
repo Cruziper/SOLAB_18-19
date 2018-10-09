@@ -17,18 +17,27 @@ int main(int argc, char** argv){
     int numArgs = readLineArguments(argVector, vectorSize, buffer, bufferSize);
     printf("%s\n", argVector[0]);
 
-    pid_t pid = fork();
+    if(strcmp(argVector[0], "run")==0){
+      pid_t pid = fork();
 
-    if(pid<0){
-      perror("Erro ao criar a Fork()\n");
-      exit(-1);
+      if(pid<0){
+        perror("Erro ao criar a Fork()\n");
+        exit(-1);
+      }
+      if(pid == 0){
+        execv("./CircuitRouter-SeqSolver.c", argVector[1]);
+      }
+      else{
+        wait(NULL);
+      }
     }
-    if(pid == 0){
-      execv('./CircuitRouter-SeqSolver.c', argVector[1]);
+    if(strcmp(argVector[0], "exit")==0){
+      //Mensagens de exit para cada processo
+      exit(0);
     }
     else{
-      wait(NULL);
+      printf("Invalid comand\n");
     }
   }
-
+  return 0;
 }
