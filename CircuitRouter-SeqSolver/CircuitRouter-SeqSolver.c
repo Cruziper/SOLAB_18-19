@@ -171,20 +171,18 @@ int main(int argc, char** argv){
 //OUTPUT FILES
     FILE *outputFile;
     char* local_outputFile;
-    local_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0) 
+    local_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
     char* aux_outputFile;
     aux_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
     strcpy(local_outputFile, global_inputFile);
     strcpy(aux_outputFile, local_outputFile);
     strcat(aux_outputFile,".res");
-    if (access(aux_outputFile, 0) == 0) { 
+    if (access(aux_outputFile, 0) == 0) {
         //file exists;
-        printf("EXISTE\n");
         char* aux2_outputFile;
         aux2_outputFile = (char *) malloc(strlen(global_inputFile)+9); //9 = 1(\0) + 4(.res\0) + 4(.old\0)
         strcpy(aux2_outputFile, aux_outputFile);
         strcat(aux2_outputFile, ".old");
-        printf("%s\n", aux2_outputFile);
         rename(aux_outputFile, aux2_outputFile);
         strcat(local_outputFile, ".res");
         outputFile = fopen(local_outputFile, "w");
@@ -192,10 +190,9 @@ int main(int argc, char** argv){
             perror ("Erro a criar o ficheiro");
             exit(1);
         }
-    } 
-    else { 
+    }
+    else {
         //file does not exist;
-        printf("NAO EXISTE\n");
         strcat(local_outputFile, ".res");
         outputFile = fopen(local_outputFile, "w");
         if(outputFile == NULL) {
