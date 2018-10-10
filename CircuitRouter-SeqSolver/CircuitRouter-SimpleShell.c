@@ -5,14 +5,19 @@
 #include <sys/wait.h>
 #include "lib/commandlinereader.h"
 
+#define MAXCHILDREN 10
 
 int main(int argc, char** argv){
-
+  int i=0;
   int estado;
+  int *arrayPid;
   int vectorSize = 10;
   char *argVector[vectorSize];
   int bufferSize = 150;
   char buffer[bufferSize];
+  printf("antes: %d\n", i);
+
+  arrayPid = (int *)malloc(sizeof(int)*10);
 
   while(1){
     readLineArguments(argVector, vectorSize, buffer, bufferSize);
@@ -25,6 +30,10 @@ int main(int argc, char** argv){
         exit(-1);
       }
       if(pid == 0){
+        arrayPid[i] = getpid();
+        printf("arrayPid[%d]= %d\n", i, arrayPid[i]);
+        i++;
+        printf("depois: %d\n", i);
         execl("CircuitRouter-SeqSolver", "./CircuitRouter-SeqSolver", argVector[1], (char *)0);
       }
       else{
