@@ -4,20 +4,26 @@
 #include <string.h>
 #include <sys/wait.h>
 #include "lib/commandlinereader.h"
+#include "lib/vector.h"
 
 #define MAXCHILDREN 10
+
+typedef struct arrayPid{
+  int pidChild;
+  int estado;
+}structPid;
 
 int main(int argc, char** argv){
   int i=0;
   int j;
   int estado;
-  int *arrayPid;
   int vectorSize = 10;
   char *argVector[vectorSize];
   int bufferSize = 150;
   char buffer[bufferSize];
 
-  arrayPid = (int *)malloc(sizeof(int)*10);
+  vector_t* arrayPid = vector_alloc(vectorSize);
+
 
   while(1){
     readLineArguments(argVector, vectorSize, buffer, bufferSize);
@@ -33,17 +39,29 @@ int main(int argc, char** argv){
         execl("CircuitRouter-SeqSolver", "CircuitRouter-SeqSolver", argVector[1], (char *)0);
       }
       else{
-        arrayPid[i]= pid;
+        structPid *newChild = malloc(sizeof(structPid));
+        newChild->pidChild = pid;
+        vector_pushBack(arrayPid, newChild);
         i++;
         wait(&estado);
+        newChild->estado = estado;
       }
     }
     else if(strcmp(argVector[0], "exit")==0){
       wait(&estado);
       for (j = 0; j < i; j++) {
-        printf("CHILD EXITED (PID=%d; return )\n", arrayPid[j]);
+        structPid *auxChild = malloc(sizeof(structPid));
+        auxChild = vector_at(arrayPid, j);
+        if(auxChild->estado==0){
+          printf("CHILD EXITED (PID=%d; return OK)\n", auxChild->pidChild);
+        }
+        else{
+            printf("CHILD EXITED (PID=%d; return NOK)\n", auxChild->pidChild);
+        }
+      //  printf("CHILD EXITED (PID=%d; return %d)\n", auxChild->pidChild, auxChild->estado);
       }
       printf("END.\n");
+      vector_free(arrayPid);
       exit(0);
     }
     else{
