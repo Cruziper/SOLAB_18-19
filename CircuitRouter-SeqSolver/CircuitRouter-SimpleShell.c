@@ -6,8 +6,6 @@
 #include "lib/commandlinereader.h"
 #include "lib/vector.h"
 
-#define MAXCHILDREN 10
-
 typedef struct arrayPid{
   int pidChild;
   int estado;
@@ -17,6 +15,7 @@ int main(int argc, char** argv){
   int i=0;
   int j;
   int estado;
+  int maxchildren=1;
   int vectorSize = 10;
   char *argVector[vectorSize];
   int bufferSize = 150;
@@ -30,7 +29,7 @@ int main(int argc, char** argv){
 
     if(strcmp(argVector[0], "run")==0){
       pid_t pid = fork();
-
+      int argm=atoi(argv[1]);
       if(pid<0){
         perror("Erro ao criar a Fork()\n");
         exit(-1);
@@ -41,10 +40,16 @@ int main(int argc, char** argv){
       else{
         structPid *newChild = malloc(sizeof(structPid));
         newChild->pidChild = pid;
+        printf("antes: %d\n", maxchildren);
+        maxchildren++;
+        printf("depois: %d\n", maxchildren);
         vector_pushBack(arrayPid, newChild);
         i++;
-        wait(&estado);
-        newChild->estado = estado;
+        if(maxchildren>argm){
+            wait(&estado);
+            newChild->estado = estado;
+            maxchildren--;
+        }
       }
     }
     else if(strcmp(argVector[0], "exit")==0){
@@ -52,13 +57,17 @@ int main(int argc, char** argv){
       for (j = 0; j < i; j++) {
         structPid *auxChild = malloc(sizeof(structPid));
         auxChild = vector_at(arrayPid, j);
-        if(auxChild->estado==0){
-          printf("CHILD EXITED (PID=%d; return OK)\n", auxChild->pidChild);
+        if(WIFEXITED(auxChild->estado)){
+          if(WEXITSTATUS(auxChild->estado)==0){
+            printf("CHILD EXITED (PID=%d; return OK)\n", auxChild->pidChild);
+          }
+          else{
+            printf("CHILD EXITED (PID=%d; return NOK)\n", auxChild->pidChild);
+          }
         }
         else{
-            printf("CHILD EXITED (PID=%d; return NOK)\n", auxChild->pidChild);
+            printf("CHILD EXITED (PID=%d; return NOK (KILLED))\n", auxChild->pidChild);
         }
-      //  printf("CHILD EXITED (PID=%d; return %d)\n", auxChild->pidChild, auxChild->estado);
       }
       printf("END.\n");
       vector_free(arrayPid);
