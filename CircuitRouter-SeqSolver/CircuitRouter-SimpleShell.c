@@ -9,13 +9,13 @@
 
 int main(int argc, char** argv){
   int i=0;
+  int j;
   int estado;
   int *arrayPid;
   int vectorSize = 10;
   char *argVector[vectorSize];
   int bufferSize = 150;
   char buffer[bufferSize];
-  printf("antes: %d\n", i);
 
   arrayPid = (int *)malloc(sizeof(int)*10);
 
@@ -29,19 +29,21 @@ int main(int argc, char** argv){
         perror("Erro ao criar a Fork()\n");
         exit(-1);
       }
-      if(pid == 0){
-        arrayPid[i] = getpid();
-        printf("arrayPid[%d]= %d\n", i, arrayPid[i]);
-        i++;
-        printf("depois: %d\n", i);
-        execl("CircuitRouter-SeqSolver", "./CircuitRouter-SeqSolver", argVector[1], (char *)0);
+      else if(pid == 0){
+        execl("CircuitRouter-SeqSolver", "CircuitRouter-SeqSolver", argVector[1], (char *)0);
       }
       else{
+        arrayPid[i]= pid;
+        i++;
         wait(&estado);
       }
     }
     else if(strcmp(argVector[0], "exit")==0){
-      //Mensagens de exit para cada processo
+      wait(&estado);
+      for (j = 0; j < i; j++) {
+        printf("CHILD EXITED (PID=%d; return )\n", arrayPid[j]);
+      }
+      printf("END.\n");
       exit(0);
     }
     else{
